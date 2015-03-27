@@ -457,7 +457,7 @@
         command: /tmp/set-etc-environment.sh PYCHARM_JDK  /usr/lib/jvm/oracle-jdk-8
 
 - name: Jetbrain's RubyMine IDE
-  hosts: gui 
+  hosts: nobody 
   tasks:
       - name: Create Software directory
         file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
@@ -501,7 +501,7 @@
         command: /tmp/set-etc-environment.sh WEBIDE_JDK /usr/lib/jvm/oracle-jdk-8
 
 - name: Spring Tool Suite
-  hosts: gui 
+  hosts: nobody 
   tasks:
       - name: Create Software directory
         file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
@@ -521,7 +521,7 @@
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
 - name: Groovy/Grails Tool Suite
-  hosts: gui 
+  hosts: nobody 
   tasks:
       - name: Create Software directory
         file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
