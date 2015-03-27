@@ -235,6 +235,16 @@
             - "9300:9300"
             volumes_from:
             - elasticsearch-data
+      - name: memcached
+        docker:
+            name: memcached
+            hostname: memcached
+            image: memcached
+            state: started
+            restart_policy: on-failure
+            pull: always
+            ports:
+            - "11211:11211"
 
 
 - name: Start Desktop Docker Containers 
