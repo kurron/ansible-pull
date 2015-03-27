@@ -251,3 +251,23 @@
       - name: Export WEBIDE_JDK
         command: /tmp/set-etc-environment.sh WEBIDE_JDK /usr/lib/jvm/oracle-jdk-8
 
+- name: Spring Tool Suite
+  hosts: gui 
+  tasks:
+      - name: Create Software directory
+        file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
+      - name: Download STS
+        get_url: url=http://dist.springsource.com/release/STS/3.6.4.RELEASE/dist/e4.4/spring-tool-suite-3.6.4.RELEASE-e4.4.2-linux-gtk-x86_64.tar.gz dest=/root/sts.tar.gz mode=444
+      - name: Unpack STS
+        unarchive: src=/root/sts.tar.gz dest=/home/vagrant/Software copy=no owner=vagrant group=vagrant creates=/home/vagrant/Software/sts-bundle/sts-3.6.4.RELEASE/readme
+      - name: Soft-link STS
+        file: src=/home/vagrant/Software/sts-bundle/sts-3.6.4.RELEASE path=/home/vagrant/Software/sts state=link
+      - name: Soft-link JRE
+        file: src=/usr/lib/jvm/oracle-jdk-8/jre path=/home/vagrant/Software/sts-bundle/sts-3.6.4.RELEASE/jre state=link
+      - name: Create Desktop directory
+        file: path=/home/vagrant/Desktop owner=vagrant group=vagrant state=directory mode=755
+      - name: Copy desktop STS file
+        copy: src=files/STS.desktop dest=/home/vagrant/Desktop/STS.desktop owner=vagrant group=vagrant backup=no mode=755
+      - name: Set permissions on the home directory
+        file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
+
