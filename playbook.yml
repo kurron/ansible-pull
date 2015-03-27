@@ -59,7 +59,7 @@
       - name: Install Webmin software
         apt: name=webmin state=latest
 
-- name: Start Docker Containers 
+- name: Start Healdess Docker Containers 
   hosts: headless
   tasks:
       - name: Consul Primary
@@ -68,6 +68,33 @@
             hostname: consul-primary
             image: progrium/consul
             command: -server -bootstrap-expect 1 -ui-dir /ui
+            state: started
+            restart_policy: on-failure
+            pull: always
+            publish_all_ports: true
+      - name: Consul Registrator
+        docker:
+            name: registrator
+            hostname: registrator
+            image: gliderlabs/registrator
+            command: consul://localhost:8500
+            state: started
+            restart_policy: on-failure
+            pull: always
+            publish_all_ports: true
+            volumes:
+            - /var/run/docker.sock:/tmp/docker.sock
+
+
+- name: Start Desktop Docker Containers 
+  hosts: nobody
+  tasks:
+      - name: Consul Secondary
+        docker:
+            name: consul-secondary
+            hostname: consul-secondary
+            image: progrium/consul
+            command: -server -join $JOIN_IP -ui-dir /ui
             state: started
             restart_policy: on-failure
             pull: always
