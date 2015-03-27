@@ -192,8 +192,8 @@
             volumes_from:
             - nginx-data
             env:
-                SERVICE_8080_NAME: nginx
-                SERVICE_8443_NAME: nginx-secure
+                SERVICE_80_NAME: nginx
+                SERVICE_443_NAME: nginx-secure
       - name: MySQL Data
         docker:
             name: mysql-data
