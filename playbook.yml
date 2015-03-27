@@ -135,3 +135,19 @@
       - name: Export M2_HOME
         command: /tmp/set-etc-environment.sh M2_HOME /home/vagrant/Software/maven
 
+- name: Node
+  hosts: gui 
+  tasks:
+      - name: Download Node
+        get_url: url=http://nodejs.org/dist/v0.12.0/node-v0.12.0-linux-x64.tar.gz dest=/root/node.tar.gz mode=444
+      - name: Unpack Node
+        unarchive: src=/root/node.tar.gz dest=/opt copy=no owner=root group=root creates=/opt/node-v0.12.0-linux-x64/LICENSE
+      - name: Soft-link Node
+        file: src=/opt/node-v0.12.0-linux-x64/bin/node path=/usr/local/bin/node state=link
+      - name: Soft-link NPM
+        file: src=/opt/node-v0.12.0-linux-x64/bin/npm path=/usr/local/bin/npm state=link
+      - name: Set permissions on the opt directory
+        file: path=/opt owner=root group=root recurse=true state=directory
+      - name: Update npm
+        command: /usr/local/bin/npm install -g npm@"2.7.1"
+
