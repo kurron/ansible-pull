@@ -152,6 +152,26 @@
             - posgresql-data
             env:
                 POSTGRES_PASSWORD: posgres
+      - name: Nginx Data
+        docker:
+            name: nginx-data
+            image: busybox
+            state: present
+            volumes:
+            - /var/cache/nginx
+      - name: Nginx
+        docker:
+            name: nginx
+            hostname: nginx
+            image: nginx
+            state: started
+            restart_policy: on-failure
+            pull: always
+            ports:
+            - "8080:80"
+            - "8443:443"
+            volumes_from:
+            - nginx-data
 
 
 - name: Start Desktop Docker Containers 
