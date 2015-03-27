@@ -151,3 +151,15 @@
       - name: Update npm
         command: /usr/local/bin/npm install -g npm@"2.7.1"
 
+- name: FFmpeg binary
+  hosts: gui 
+  tasks:
+      - name: Download FFmpeg
+        get_url: url=http://johnvansickle.com/ffmpeg/releases/ffmpeg-2.6.1-64bit-static.tar.xz dest=/root/ffmpeg.tar.xz mode=444
+      - name: Unpack FFmpeg
+        unarchive: src=/root/ffmpeg.tar.xz dest=/opt copy=no owner=root group=root creates=/opt/ffmpeg-2.6.1-64bit-static/ffprobe
+      - name: Soft-link FFmpeg
+        file: src=/opt/ffmpeg-2.6.1-64bit-static path=/opt/ffmpeg state=link
+      - name: Set permissions on the opt directory
+        file: path=/opt owner=root group=root recurse=true state=directory
+
