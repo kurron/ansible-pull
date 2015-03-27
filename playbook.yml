@@ -172,6 +172,30 @@
             - "8443:443"
             volumes_from:
             - nginx-data
+      - name: MySQL Data
+        docker:
+            name: mysql-data
+            image: busybox
+            state: present
+            volumes:
+            - /var/lib/mysql
+      - name: MySQL
+        docker:
+            name: mysql
+            hostname: mysql
+            image: mysql
+            state: started
+            restart_policy: on-failure
+            pull: always
+            ports:
+            - "3306:3306"
+            volumes_from:
+            - mysql-data
+            env:
+                MYSQL_ROOT_PASSWORD: mysql
+                MYSQL_USER: mysql
+                MYSQL_PASSWORD: mysql
+                MYSQL_DATABASE: example
 
 
 - name: Start Desktop Docker Containers 
