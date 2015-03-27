@@ -67,21 +67,28 @@
             name: consul-primary
             hostname: consul-primary
             image: progrium/consul
-            command: -server -bootstrap-expect 1 -ui-dir /ui
+            command: -server -bootstrap-expect 1 -advertise 192.168.44.30 -ui-dir /ui
             state: started
             restart_policy: on-failure
             pull: always
-            publish_all_ports: true
+            ports:
+            - "8300:8300"
+            - "8301:8301"
+            - "8301:8301/udp"
+            - "8302:8302"
+            - "8302:8302/udp"
+            - "8400:8400"
+            - "8500:8500"
+            - "53:53/udp"
       - name: Consul Registrator
         docker:
             name: registrator
             hostname: registrator
             image: gliderlabs/registrator
-            command: consul://localhost:8500
+            command: -ip 192.168.44.30 consul://192.168.44.30:8500
             state: started
             restart_policy: on-failure
             pull: always
-            publish_all_ports: true
             volumes:
             - /var/run/docker.sock:/tmp/docker.sock
       - name: Redis Data
@@ -100,7 +107,8 @@
             state: started
             restart_policy: on-failure
             pull: always
-            publish_all_ports: true
+            ports:
+            - "6379:6379"
             volumes_from:
             - redis-data
       - name: RabbitMQ Data
@@ -118,7 +126,9 @@
             state: started
             restart_policy: on-failure
             pull: always
-            publish_all_ports: true
+            ports:
+            - "5672:5672"
+            - "15672:15672"
             volumes_from:
             - rabbitmq-data
 
