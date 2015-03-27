@@ -163,3 +163,25 @@
       - name: Set permissions on the opt directory
         file: path=/opt owner=root group=root recurse=true state=directory
 
+- name: Jetbrains IntelliJ IDEA
+  hosts: gui 
+  tasks:
+      - name: Create Software directory
+        file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
+      - name: Download IntelliJ IDEA
+        get_url: url=http://download.jetbrains.com/idea/ideaIU-14.1.tar.gz dest=/root/idea.tar.gz mode=444
+      - name: Unpack IntelliJ IDEA
+        unarchive: src=/root/idea.tar.gz dest=/home/vagrant/Software copy=no owner=vagrant group=vagrant creates=/home/vagrant/Software/idea-IU-141.177.4/build.txt
+      - name: Soft-link IntelliJ
+        file: src=/home/vagrant/Software/idea-IU-141.177.4 path=/home/vagrant/Software/idea state=link
+      - name: Create Desktop directory
+        file: path=/home/vagrant/Desktop owner=vagrant group=vagrant state=directory mode=755
+      - name: Copy desktop IntelliJ file
+        copy: src=files/InjelliJ.desktop dest=/home/vagrant/Desktop/InjelliJ.desktop owner=vagrant group=vagrant backup=no mode=755
+      - name: Copy export script to a safe place
+        copy: src=scripts/set-etc-environment.sh dest=/tmp/set-etc-environment.sh owner=root group=root mode=755 backup=no
+      - name: Export IDEA_JDK
+        command: /tmp/set-etc-environment.sh IDEA_JDK /usr/lib/jvm/oracle-jdk-8
+      - name: Set permissions on the home directory
+        file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
+
