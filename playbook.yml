@@ -13,6 +13,7 @@
            - telnet
            - apt-transport-https
            - wget
+           - tmux
       - name: Download PIP
         get_url: url=https://raw.github.com/pypa/pip/master/contrib/get-pip.py dest=/root/get-pip.py mode=444
       - name: Install PIP
