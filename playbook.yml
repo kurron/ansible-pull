@@ -215,6 +215,26 @@
             - "27017:27017"
             volumes_from:
             - mongodb-data
+      - name: Elasticsearch Data
+        docker:
+            name: elasticsearch-data
+            image: busybox
+            state: present
+            volumes:
+            - /usr/share/elasticsearch/data
+      - name: Elasticsearch
+        docker:
+            name: elasticsearch
+            hostname: elasticsearch
+            image: elasticsearch
+            state: started
+            restart_policy: on-failure
+            pull: always
+            ports:
+            - "9200:9200"
+            - "9300:9300"
+            volumes_from:
+            - elasticsearch-data
 
 
 - name: Start Desktop Docker Containers 
