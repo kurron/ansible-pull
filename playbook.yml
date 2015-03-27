@@ -185,3 +185,25 @@
       - name: Set permissions on the home directory
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
+- name: Jetbrain's PyCharm IDE
+  hosts: gui 
+  tasks:
+      - name: Create Software directory
+        file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
+      - name: Download PyCharm
+        get_url: url=http://download.jetbrains.com/python/pycharm-professional-4.0.5.tar.gz dest=/root/pycharm.tar.gz mode=444
+      - name: Unpack PyCharm
+        unarchive: src=/root/pycharm.tar.gz dest=/home/vagrant/Software copy=no owner=vagrant group=vagrant creates=/home/vagrant/Software/pycharm-4.0.5/build.txt
+      - name: Soft-link PyCharm
+        file: src=/home/vagrant/Software/pycharm-4.0.5 path=/home/vagrant/Software/pycharm state=link
+      - name: Create Desktop directory
+        file: path=/home/vagrant/Desktop owner=vagrant group=vagrant state=directory mode=755
+      - name: Copy desktop PyCharm file
+        copy: src=files/PyCharm.desktop dest=/home/vagrant/Desktop/PyCharm.desktop owner=vagrant group=vagrant backup=no mode=755
+      - name: Set permissions on the home directory
+        file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
+      - name: Copy export script to a safe place
+        copy: src=scripts/set-etc-environment.sh dest=/tmp/set-etc-environment.sh owner=root group=root mode=755 backup=no
+      - name: Export PYCHARM_JDK
+        command: /tmp/set-etc-environment.sh PYCHARM_JDK  /usr/lib/jvm/oracle-jdk-8
+
