@@ -99,3 +99,21 @@
       - name: Set permissions on the home directory
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
+- name: Apache Ant bits
+  hosts: gui
+  tasks:
+      - name: Create Software directory
+        file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
+      - name: Download Ant
+        get_url: url=http://apache.mirrors.pair.com/ant/binaries/apache-ant-1.9.4-bin.tar.gz dest=/root/ant.tar.gz mode=444
+      - name: Unpack Ant
+        unarchive: src=/root/ant.tar.gz dest=/home/vagrant/Software copy=no owner=vagrant group=vagrant creates=/home/vagrant/Software/apache-ant-1.9.4/README
+      - name: Soft-link Ant
+        file: src=/home/vagrant/Software/apache-ant-1.9.4 path=/home/vagrant/Software/ant state=link
+      - name: Set permissions on the home directory
+        file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
+      - name: Copy export script to a safe place
+        copy: src=scripts/set-etc-environment.sh dest=/tmp/set-etc-environment.sh owner=root group=root mode=755 backup=no
+      - name: Export ANT_HOME
+        command: /tmp/set-etc-environment.sh ANT_HOME /home/vagrant/Software/ant
+
