@@ -84,6 +84,25 @@
             publish_all_ports: true
             volumes:
             - /var/run/docker.sock:/tmp/docker.sock
+      - name: Redis Data
+        docker:
+            name: redis-data
+            image: busybox
+            state: present
+            volumes:
+            - /data
+      - name: Redis
+        docker:
+            name: redis
+            hostname: redis
+            image: redis:latest
+            command: redis-server --appendonly yes
+            state: started
+            restart_policy: on-failure
+            pull: always
+            publish_all_ports: true
+            volumes_from:
+            - redis-data
 
 
 - name: Start Desktop Docker Containers 
