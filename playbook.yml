@@ -24,6 +24,8 @@
         apt: name=lxc-docker state=latest update_cache=true cache_valid_time=600
       - name: Add vagrant to the docker group
         user: name=vagrant state=present groups=docker
+      - name: Have Docker use Consul for DNS
+        lineinfile: dest=/etc/default/docker line="DOCKER_OPTS='--dns 192.168.44.60 --dns 8.8.8.8 --dns 8.8.4.4 --dns-search service.consul'"
       - name: Set Memory and Swap Accounting
         lineinfile: dest=/etc/default/grub regexp='^GRUB_CMDLINE_LINUX=""' line='GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"'
       - name: Rebuild GRUB
@@ -101,7 +103,7 @@
             name: registrator
             hostname: registrator
             image: gliderlabs/registrator
-            command: -ip 192.168.44.30 consul://192.168.44.60:8500
+            command: -ip 192.168.44.60 consul://192.168.44.60:8500
             state: started
             restart_policy: always
             pull: always
