@@ -15,7 +15,7 @@
            - wget
 
 - name: Webmin 
-  hosts: docker
+  hosts: headless
   tasks:
       - name: Install Webmin keys
         apt_key: url='http://www.webmin.com/jcameron-key.asc' state=present
