@@ -248,18 +248,26 @@
 
 
 - name: Start Desktop Docker Containers 
-  hosts: nobody
+  hosts: gui
   tasks:
       - name: Consul Secondary
         docker:
             name: consul-secondary
             hostname: consul-secondary
             image: progrium/consul
-            command: -server -join $JOIN_IP -ui-dir /ui
+            command: -server -join 192.168.44.60 -ui-dir /ui
             state: started
             restart_policy: on-failure
             pull: always
-            publish_all_ports: true
+            ports:
+            - "8300:8300"
+            - "8301:8301"
+            - "8301:8301/udp"
+            - "8302:8302"
+            - "8302:8302/udp"
+            - "8400:8400"
+            - "8500:8500"
+            - "53:53/udp"
 
 - name: Oracle JDK 8 bits
   hosts: gui 
