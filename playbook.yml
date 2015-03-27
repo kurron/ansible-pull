@@ -62,6 +62,13 @@
 - name: Start Healdess Docker Containers 
   hosts: headless
   tasks:
+      - name: Consul Data
+        docker:
+            name: consul-data
+            image: busybox
+            state: present
+            volumes:
+            - /data
       - name: Consul Primary
         docker:
             name: consul-primary
@@ -80,6 +87,8 @@
             - "8400:8400"
             - "8500:8500"
             - "53:53/udp"
+            volumes_from:
+            - consul-data
             env:
                 SERVICE_8300_NAME: consul
                 SERVICE_8301_NAME: consul-serf-lan
