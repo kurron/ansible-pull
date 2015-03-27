@@ -87,3 +87,15 @@
       - name: Export JAVA7_HOME
         command: /tmp/set-etc-environment.sh JAVA7_HOME /usr/lib/jvm/oracle-jdk-7
 
+- name: Groovy Environment Manager
+  hosts: gui 
+  tasks:
+      - name: Copy GVM installation script to a safe place
+        copy: src=scripts/install-gvm.sh dest=/tmp/install-gvm.sh owner=vagrant group=vagrant mode=755 backup=no
+      - name: Install GVM
+        shell: sudo --user vagrant --set-home --non-interactive --login /tmp/install-gvm.sh --
+      - name: Copy GVM configuration file
+        copy: src=files/gvm.config dest=/home/vagrant/.gvm/etc/config owner=vagrant group=vagrant mode=644 backup=no
+      - name: Set permissions on the home directory
+        file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
+
