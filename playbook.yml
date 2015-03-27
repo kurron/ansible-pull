@@ -13,3 +13,16 @@
            - telnet
            - apt-transport-https
            - wget
+
+- name: Webmin 
+  hosts: docker
+  tasks:
+      - name: Install Webmin keys
+        apt_key: url='http://www.webmin.com/jcameron-key.asc' state=present
+      - name: Install primary Webmin repository
+        apt_repository: repo='deb http://download.webmin.com/download/repository sarge contrib' state=present
+      - name: Install secondary Webmin repository
+        apt_repository: repo='deb http://webmin.mirror.somersettechsolutions.co.uk/repository sarge contrib' state=present
+      - name: Install Webmin software
+        apt: name=webmin state=latest
+
