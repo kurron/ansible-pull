@@ -80,6 +80,13 @@
             - "8400:8400"
             - "8500:8500"
             - "53:53/udp"
+            env:
+                SERVICE_8300_NAME: consul
+                SERVICE_8301_NAME: consul-serf-lan
+                SERVICE_8302_NAME: consul-serf-wan
+                SERVICE_8400_NAME: consul-rpc
+                SERVICE_8500_NAME: consul-http
+                SERVICE_53_NAME: consul-dns
       - name: Consul Registrator
         docker:
             name: registrator
@@ -131,6 +138,9 @@
             - "15672:15672"
             volumes_from:
             - rabbitmq-data
+            env:
+                SERVICE_5672_NAME: rabbitmq
+                SERVICE_15672_NAME: rabbitmq-console
       - name: PostgreSQL Data
         docker:
             name: posgresql-data
@@ -172,6 +182,9 @@
             - "8443:443"
             volumes_from:
             - nginx-data
+            env:
+                SERVICE_8080_NAME: nginx
+                SERVICE_8443_NAME: nginx-secure
       - name: MySQL Data
         docker:
             name: mysql-data
@@ -235,6 +248,9 @@
             - "9300:9300"
             volumes_from:
             - elasticsearch-data
+            env:
+                SERVICE_9200_NAME: elasticsearch
+                SERVICE_9300_NAME: elasticsearch-cluster
       - name: memcached
         docker:
             name: memcached
