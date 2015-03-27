@@ -10,4 +10,4 @@ fi
 curl --silent get.gvmtool.net | bash
 
 # signal a successful provision
-
+sudo touch ${DONEFILE}

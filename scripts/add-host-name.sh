@@ -2,17 +2,17 @@
 
 # sets the specified environment variable in /etc/environment in an idempotent way
 
-VARIABLE_NAME=$1
-VARIABLE_VALUE=$2
+HOST_NAME=$1
+IP_ADDRESS=$2
 
-DONEFILE=/var/ansible-${VARIABLE_NAME}
+DONEFILE=/var/ansible-${HOST_NAME}
 
 # make sure we are idempotent
 if [ -f "${DONEFILE}" ]; then
     exit 0
 fi
 
-echo ${VARIABLE_NAME}=${VARIABLE_VALUE} | tee --append /etc/environment
+echo ${IP_ADDRESS} ${HOST_NAME} | tee --append /etc/hosts 
 
 # signal a successful provision
 touch ${DONEFILE}
