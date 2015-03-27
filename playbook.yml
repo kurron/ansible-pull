@@ -13,6 +13,10 @@
            - telnet
            - apt-transport-https
            - wget
+      - name: Download PIP
+        get_url: url=https://raw.github.com/pypa/pip/master/contrib/get-pip.py dest=/root/get-pip.py mode=444
+      - name: Install PIP
+        command: /usr/bin/python /root/get-pip.py
 
 - name: Webmin 
   hosts: headless
