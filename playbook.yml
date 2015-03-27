@@ -275,8 +275,15 @@
 
 # adding this in seems to cause the primary to no longer work
 - name: Start Desktop Docker Containers 
-  hosts: nobody
+  hosts: gui
   tasks:
+      - name: Consul Data
+        docker:
+            name: consul-data
+            image: busybox
+            state: present
+            volumes:
+            - /data
       - name: Consul Secondary
         docker:
             name: consul-secondary
@@ -295,6 +302,15 @@
             - "8400:8400"
             - "8500:8500"
             - "53:53/udp"
+            volumes_from:
+            - consul-data
+            env:
+                SERVICE_8300_NAME: consul-secondary
+                SERVICE_8301_NAME: consul-secondary-serf-lan
+                SERVICE_8302_NAME: consul-secondary-serf-wan
+                SERVICE_8400_NAME: consul-secondary-rpc
+                SERVICE_8500_NAME: consul-secondary-http
+                SERVICE_53_NAME: consul-secondary-dns
 
 - name: Oracle JDK 8 bits
   hosts: gui 
