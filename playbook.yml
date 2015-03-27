@@ -196,6 +196,25 @@
                 MYSQL_USER: mysql
                 MYSQL_PASSWORD: mysql
                 MYSQL_DATABASE: example
+      - name: MongoDB Data
+        docker:
+            name: mongodb-data
+            image: busybox
+            state: present
+            volumes:
+            - /data/db
+      - name: MongoDB
+        docker:
+            name: mongodb
+            hostname: mongodb
+            image: mongo
+            state: started
+            restart_policy: on-failure
+            pull: always
+            ports:
+            - "27017:27017"
+            volumes_from:
+            - mongodb-data
 
 
 - name: Start Desktop Docker Containers 
