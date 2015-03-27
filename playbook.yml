@@ -69,7 +69,7 @@
             image: progrium/consul
             command: -server -bootstrap-expect 1 -advertise 192.168.44.60 -ui-dir /ui
             state: started
-            restart_policy: on-failure
+            restart_policy: always
             pull: always
             ports:
             - "8300:8300"
@@ -87,7 +87,7 @@
             image: gliderlabs/registrator
             command: -ip 192.168.44.30 consul://192.168.44.60:8500
             state: started
-            restart_policy: on-failure
+            restart_policy: always
             pull: always
             volumes:
             - /var/run/docker.sock:/tmp/docker.sock
@@ -105,7 +105,7 @@
             image: redis
             command: redis-server --appendonly yes
             state: started
-            restart_policy: on-failure
+            restart_policy: always
             pull: always
             ports:
             - "6379:6379"
@@ -124,7 +124,7 @@
             hostname: rabbitmq
             image: rabbitmq
             state: started
-            restart_policy: on-failure
+            restart_policy: always
             pull: always
             ports:
             - "5672:5672"
@@ -144,7 +144,7 @@
             hostname: postgresql
             image: postgres
             state: started
-            restart_policy: on-failure
+            restart_policy: always
             pull: always
             ports:
             - "5432:5432"
@@ -165,7 +165,7 @@
             hostname: nginx
             image: nginx
             state: started
-            restart_policy: on-failure
+            restart_policy: always
             pull: always
             ports:
             - "8080:80"
@@ -185,7 +185,7 @@
             hostname: mysql
             image: mysql
             state: started
-            restart_policy: on-failure
+            restart_policy: always
             pull: always
             ports:
             - "3306:3306"
@@ -209,7 +209,7 @@
             hostname: mongodb
             image: mongo
             state: started
-            restart_policy: on-failure
+            restart_policy: always
             pull: always
             ports:
             - "27017:27017"
@@ -228,7 +228,7 @@
             hostname: elasticsearch
             image: elasticsearch
             state: started
-            restart_policy: on-failure
+            restart_policy: always
             pull: always
             ports:
             - "9200:9200"
@@ -241,7 +241,7 @@
             hostname: memcached
             image: memcached
             state: started
-            restart_policy: on-failure
+            restart_policy: always
             pull: always
             ports:
             - "11211:11211"
@@ -257,7 +257,7 @@
             image: progrium/consul
             command: -server -join 192.168.44.60 -ui-dir /ui
             state: started
-            restart_policy: on-failure
+            restart_policy: always
             pull: always
             ports:
             - "8300:8300"
