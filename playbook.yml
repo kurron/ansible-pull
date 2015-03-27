@@ -30,6 +30,10 @@
         service: name=docker state=restarted
       - name: Install Docker Compose
         command: pip install --upgrade docker-compose
+      - name: Copy bash alias file
+        copy: src=files/.bash_aliases dest=/home/vagrant/.bash_aliases owner=vagrant group=vagrant backup=no mode=744
+      - name: Set permissions on the home directory
+        file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
 - name: Webmin 
   hosts: headless
