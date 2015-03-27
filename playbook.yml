@@ -47,3 +47,25 @@
       - name: Install Webmin software
         apt: name=webmin state=latest
 
+- name: Oracle JDK 8 bits
+  hosts: gui 
+  tasks:
+      - name: Create destination directory
+        file: path=/usr/lib/jvm owner=root group=root state=directory mode=755
+      - name: Copy JDK 8 download script to a safe place
+        copy: src=scripts/download-jdk-8.sh dest=/tmp/download-jdk-8.sh owner=root group=root mode=755 backup=no
+      - name: Execute download script
+        command: /tmp/download-jdk-8.sh
+      - name: unpack the archive
+        unarchive: src=/root/jdk-8.tar.gz dest=/usr/lib/jvm copy=no owner=root group=root mode=755 creates=/usr/lib/jvm/jdk1.8.0_40/COPYRIGHT
+      - name: soft-link the JDK to a normalized location
+        file: src=/usr/lib/jvm/jdk1.8.0_40 dest=/usr/lib/jvm/oracle-jdk-8 owner=root group=root state=link
+      - name: Copy export script to a safe place
+        copy: src=scripts/set-etc-environment.sh dest=/tmp/set-etc-environment.sh owner=root group=root mode=755 backup=no
+      - name: Execute JAVA_HOME
+        command: /tmp/set-etc-environment.sh JAVA_HOME /usr/lib/jvm/oracle-jdk-8
+      - name: Execute JDK_HOME
+        command: /tmp/set-etc-environment.sh JDK_HOME /usr/lib/jvm/oracle-jdk-8
+      - name: Execute JAVA8_HOME
+        command: /tmp/set-etc-environment.sh JAVA8_HOME /usr/lib/jvm/oracle-jdk-8
+
