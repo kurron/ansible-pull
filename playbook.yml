@@ -102,7 +102,7 @@
         docker:
             name: redis
             hostname: redis
-            image: redis:latest
+            image: redis
             command: redis-server --appendonly yes
             state: started
             restart_policy: on-failure
@@ -122,7 +122,7 @@
         docker:
             name: rabbitmq
             hostname: rabbitmq
-            image: rabbitmq:latest
+            image: rabbitmq
             state: started
             restart_policy: on-failure
             pull: always
@@ -131,6 +131,27 @@
             - "15672:15672"
             volumes_from:
             - rabbitmq-data
+      - name: PostgreSQL Data
+        docker:
+            name: posgresql-data
+            image: busybox
+            state: present
+            volumes:
+            - /var/lib/postgresql/data
+      - name: PostgreSQL
+        docker:
+            name: postgresql
+            hostname: postgresql
+            image: postgres
+            state: started
+            restart_policy: on-failure
+            pull: always
+            ports:
+            - "5432:5432"
+            volumes_from:
+            - posgresql-data
+            env:
+                POSTGRES_PASSWORD: posgres
 
 
 - name: Start Desktop Docker Containers 
