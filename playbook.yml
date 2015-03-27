@@ -47,6 +47,20 @@
       - name: Install Webmin software
         apt: name=webmin state=latest
 
+- name: Start Docker Containers 
+  hosts: headless
+  tasks:
+      - name: Consul Primary
+        docker:
+            name: consul-primary
+            hostname: consul-primary
+            image: progrium/consul
+            command: -server -bootstrap-expect 1 -ui-dir /ui
+            state: started
+            restart_policy: on-failure
+            pull: always
+            publish_all_ports: true
+
 - name: Oracle JDK 8 bits
   hosts: gui 
   tasks:
