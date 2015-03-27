@@ -246,9 +246,9 @@
             ports:
             - "11211:11211"
 
-
+# adding this in seems to cause the primary to no longer work
 - name: Start Desktop Docker Containers 
-  hosts: gui
+  hosts: nobody
   tasks:
       - name: Consul Secondary
         docker:
