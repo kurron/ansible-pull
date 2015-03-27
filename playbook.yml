@@ -67,7 +67,7 @@
             name: consul-primary
             hostname: consul-primary
             image: progrium/consul
-            command: -server -bootstrap-expect 1 -advertise 192.168.44.30 -ui-dir /ui
+            command: -server -bootstrap-expect 1 -advertise 192.168.44.60 -ui-dir /ui
             state: started
             restart_policy: on-failure
             pull: always
@@ -85,7 +85,7 @@
             name: registrator
             hostname: registrator
             image: gliderlabs/registrator
-            command: -ip 192.168.44.30 consul://192.168.44.30:8500
+            command: -ip 192.168.44.30 consul://192.168.44.60:8500
             state: started
             restart_policy: on-failure
             pull: always
