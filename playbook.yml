@@ -50,7 +50,7 @@
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
 - name: Webmin 
-  hosts: headless
+  hosts: nobody
   tasks:
       - name: Install Webmin keys
         apt_key: url='http://www.webmin.com/jcameron-key.asc' state=present
@@ -76,7 +76,7 @@
             name: consul-primary
             hostname: consul-primary
             image: progrium/consul
-            command: -server -bootstrap-expect 2 -advertise 192.168.44.60 -ui-dir /ui
+            command: -server -bootstrap -advertise 192.168.44.60 -ui-dir /ui
             state: started
             restart_policy: always
             pull: always
@@ -275,7 +275,7 @@
 
 # adding this in seems to cause the primary to no longer work
 - name: Start Desktop Docker Containers 
-  hosts: gui
+  hosts: nobody
   tasks:
       - name: Consul Data
         docker:
