@@ -103,6 +103,24 @@
             publish_all_ports: true
             volumes_from:
             - redis-data
+      - name: RabbitMQ Data
+        docker:
+            name: rabbitmq-data
+            image: busybox
+            state: present
+            volumes:
+            - /var/lib/rabbitmq
+      - name: RabbitMQ
+        docker:
+            name: rabbitmq
+            hostname: rabbitmq
+            image: rabbitmq:latest
+            state: started
+            restart_policy: on-failure
+            pull: always
+            publish_all_ports: true
+            volumes_from:
+            - rabbitmq-data
 
 
 - name: Start Desktop Docker Containers 
