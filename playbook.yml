@@ -76,7 +76,7 @@
             name: consul-primary
             hostname: consul-primary
             image: progrium/consul
-            command: -server -bootstrap-expect 1 -advertise 192.168.44.60 -ui-dir /ui
+            command: -server -bootstrap-expect 2 -advertise 192.168.44.60 -ui-dir /ui
             state: started
             restart_policy: always
             pull: always
