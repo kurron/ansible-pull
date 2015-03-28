@@ -250,7 +250,7 @@
                 MYSQL_DATABASE: example
 
 - name: Install MongoDB Docker Containers
-  hosts: headless
+  hosts: mongodb
   tasks:
       - name: MongoDB Data
         docker:
