@@ -299,6 +299,19 @@
                 SERVICE_9200_NAME: elasticsearch
                 SERVICE_9300_NAME: elasticsearch-cluster
 
+# still trying t figure out how to use this image
+- name: Install Logstash Docker Containers
+  hosts: logstash-container
+  tasks:
+      - name: logstash
+        docker:
+            name: logstash
+            hostname: logstash
+            image: logstash
+            state: started
+            restart_policy: always
+            pull: always
+
 - name: Install mechached Docker Containers 
   hosts: memcached-container
   tasks:
@@ -312,6 +325,8 @@
             pull: always
             ports:
             - "11211:11211"
+            env:
+                SERVICE_11211_NAME: memcached
 
 - name: Oracle JDK 8 bits
   hosts: oracle-jdk-8-box 
