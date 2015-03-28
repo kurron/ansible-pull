@@ -25,7 +25,7 @@
       - name: Add vagrant to the docker group
         user: name=vagrant state=present groups=docker
       - name: Have Docker use Consul for DNS
-        lineinfile: dest=/etc/default/docker line="DOCKER_OPTS='--dns 192.168.44.60 --dns 8.8.8.8 --dns-search service.consul'"
+        lineinfile: dest=/etc/default/docker line='DOCKER_OPTS="--dns 192.168.44.60 --dns 8.8.8.8 --dns 8.8.4.4 --dns-search service.consul"'
       - name: Set Memory and Swap Accounting
         lineinfile: dest=/etc/default/grub regexp='^GRUB_CMDLINE_LINUX=""' line='GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"'
       - name: Rebuild GRUB
@@ -101,8 +101,7 @@
       - name: Consul Registrator
         docker:
             name: registrator
-# the documentation says "it's a good idea to set the hostname to the machine host"
-            hostname: docker
+            hostname: registrator
             image: gliderlabs/registrator
             command: -ip 192.168.44.60 consul://192.168.44.60:8500
             state: started
