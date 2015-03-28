@@ -73,8 +73,8 @@
             - /data
       - name: Consul Primary
         docker:
-            name: consul-primary
-            hostname: consul-primary
+            name: consul
+            hostname: consul
             image: progrium/consul
             command: -server -bootstrap -advertise 192.168.44.60 -ui-dir /ui
             state: started
