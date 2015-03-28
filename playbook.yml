@@ -76,7 +76,7 @@
             name: consul
             hostname: consul
             image: progrium/consul
-            command: -server -bootstrap -advertise 192.168.44.60 -ui-dir /ui
+            command: -server -bootstrap -ui-dir /ui
             state: started
             restart_policy: always
             pull: always
@@ -101,7 +101,8 @@
       - name: Consul Registrator
         docker:
             name: registrator
-            hostname: registrator
+# the documentation says "it's a good idea to set the hostname to the machine host"
+            hostname: docker
             image: gliderlabs/registrator
             command: -ip 192.168.44.60 consul://192.168.44.60:8500
             state: started
