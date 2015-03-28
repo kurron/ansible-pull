@@ -1,21 +1,6 @@
-- name: Common Bits 
-  hosts: all
+- name: Docker Daemon 
+  hosts: docker-host
   tasks:
-      - name: Copy the sudoers file
-        copy: src=files/passwordless-sudo dest=/etc/sudoers.d/passwordless-sudo owner=root group=root mode=0440 backup=no
-#     - name: Upgrade currently installed packages
-#       apt: "upgrade=dist state=present update_cache=true cache_valid_time=600"
-      - name: Install common packages
-        apt: "name={{ item }} state=present"
-        with_items:
-           - python-apt
-           - curl
-           - telnet
-           - apt-transport-https
-           - wget
-           - tmux
-           - subversion
-           - mercurial
       - name: Install Docker keys
         apt_key: state=present keyserver=keyserver.ubuntu.com id=36A1D7869245C8950F966E92D8576A8BA88D21E9
       - name: Install Docker repository
@@ -34,6 +19,25 @@
         service: name=docker state=restarted
       - name: Install Docker Compose
         command: pip install --upgrade docker-compose
+
+- name: Common Bits 
+  hosts: all
+  tasks:
+      - name: Copy the sudoers file
+        copy: src=files/passwordless-sudo dest=/etc/sudoers.d/passwordless-sudo owner=root group=root mode=0440 backup=no
+#     - name: Upgrade currently installed packages
+#       apt: "upgrade=dist state=present update_cache=true cache_valid_time=600"
+      - name: Install common packages
+        apt: "name={{ item }} state=present"
+        with_items:
+           - python-apt
+           - curl
+           - telnet
+           - apt-transport-https
+           - wget
+           - tmux
+           - subversion
+           - mercurial
       - name: Copy bash alias file
         copy: src=files/.bash_aliases dest=/home/vagrant/.bash_aliases owner=vagrant group=vagrant backup=no mode=744
       - name: Create GitHub directory 
@@ -50,7 +54,7 @@
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
 - name: Webmin 
-  hosts: nobody
+  hosts: webmin
   tasks:
       - name: Install Webmin keys
         apt_key: url='http://www.webmin.com/jcameron-key.asc' state=present
@@ -61,54 +65,62 @@
       - name: Install Webmin software
         apt: name=webmin state=latest
 
-- name: Start Healdess Docker Containers 
-  hosts: headless
+- name: Install Consul Docker Container 
+  hosts: consul-container
   tasks:
-#     - name: Consul Data
-#       docker:
-#           name: consul-data
-#           image: busybox
-#           state: present
-#           volumes:
-#           - /data
-#     - name: Consul Primary
-#       docker:
-#           name: consul
-#           hostname: consul
-#           image: progrium/consul
-#           command: -server -bootstrap -ui-dir /ui
-#           state: started
-#           restart_policy: always
-#           pull: always
-#           ports:
-#           - "8300:8300"
-#           - "8301:8301"
-#           - "8301:8301/udp"
-#           - "8302:8302"
-#           - "8302:8302/udp"
-#           - "8400:8400"
-#           - "8500:8500"
-#           - "53:53/udp"
-#           volumes_from:
-#           - consul-data
-#           env:
-#               SERVICE_8300_NAME: consul
-#               SERVICE_8301_NAME: consul-serf-lan
-#               SERVICE_8302_NAME: consul-serf-wan
-#               SERVICE_8400_NAME: consul-rpc
-#               SERVICE_8500_NAME: consul-http
-#               SERVICE_53_NAME: consul-dns
-#     - name: Consul Registrator
-#       docker:
-#           name: registrator
-#           hostname: registrator
-#           image: gliderlabs/registrator
-#           command: -ip 192.168.44.60 consul://192.168.44.60:8500
-#           state: started
-#           restart_policy: always
-#           pull: always
-#           volumes:
-#           - /var/run/docker.sock:/tmp/docker.sock
+      - name: Consul Data
+        docker:
+            name: consul-data
+            image: busybox
+            state: present
+            volumes:
+            - /data
+      - name: Consul
+        docker:
+            name: consul
+            hostname: consul
+            image: progrium/consul
+            command: -server -bootstrap -ui-dir /ui
+            state: started
+            restart_policy: always
+            pull: always
+            ports:
+            - "8300:8300"
+            - "8301:8301"
+            - "8301:8301/udp"
+            - "8302:8302"
+            - "8302:8302/udp"
+            - "8400:8400"
+            - "8500:8500"
+            - "53:53/udp"
+            volumes_from:
+            - consul-data
+            env:
+                SERVICE_8300_NAME: consul
+                SERVICE_8301_NAME: consul-serf-lan
+                SERVICE_8302_NAME: consul-serf-wan
+                SERVICE_8400_NAME: consul-rpc
+                SERVICE_8500_NAME: consul-http
+                SERVICE_53_NAME: consul-dns
+
+- name: Install Consul Registrator 
+  hosts: registrator
+  tasks:
+      - name: Regitrator 
+        docker:
+            name: registrator
+            hostname: registrator
+            image: gliderlabs/registrator
+            command: -ip 192.168.44.60 consul://192.168.44.60:8500
+            state: started
+            restart_policy: always
+            pull: always
+            volumes:
+            - /var/run/docker.sock:/tmp/docker.sock
+
+- name: Install Redis Containers
+  hosts: redis-container
+  tasks:
       - name: Redis Data
         docker:
             name: redis-data
@@ -129,6 +141,10 @@
             - "6379:6379"
             volumes_from:
             - redis-data
+
+- name: Install RabbitMQ Docker Containers
+  hosts: rabbitmq-container
+  tasks:
       - name: RabbitMQ Data
         docker:
             name: rabbitmq-data
@@ -152,6 +168,10 @@
             env:
                 SERVICE_5672_NAME: rabbitmq
                 SERVICE_15672_NAME: rabbitmq-console
+
+- name: Install PostgreSQL Docker Containers
+  hosts: postgresql-container
+  tasks:
       - name: PostgreSQL Data
         docker:
             name: posgresql-data
@@ -173,6 +193,10 @@
             - posgresql-data
             env:
                 POSTGRES_PASSWORD: posgres
+
+- name: Install Nginx Docker Containers
+  hosts: nginx-container
+  tasks:
       - name: Nginx Data
         docker:
             name: nginx-data
@@ -196,6 +220,10 @@
             env:
                 SERVICE_80_NAME: nginx
                 SERVICE_443_NAME: nginx-secure
+
+- name: Install MySQL Docker Containers
+  hosts: mysql-container
+  tasks:
       - name: MySQL Data
         docker:
             name: mysql-data
@@ -220,6 +248,10 @@
                 MYSQL_USER: mysql
                 MYSQL_PASSWORD: mysql
                 MYSQL_DATABASE: example
+
+- name: Install MongoDB Docker Containers
+  hosts: headless
+  tasks:
       - name: MongoDB Data
         docker:
             name: mongodb-data
@@ -239,6 +271,10 @@
             - "27017:27017"
             volumes_from:
             - mongodb-data
+
+- name: Install Elasticsearch Docker Containers
+  hosts: elasticsearch-container
+  tasks:
       - name: Elasticsearch Data
         docker:
             name: elasticsearch-data
@@ -262,6 +298,10 @@
             env:
                 SERVICE_9200_NAME: elasticsearch
                 SERVICE_9300_NAME: elasticsearch-cluster
+
+- name: Install mechached Docker Containers 
+  hosts: memcached-container
+  tasks:
       - name: memcached
         docker:
             name: memcached
@@ -273,47 +313,8 @@
             ports:
             - "11211:11211"
 
-# adding this in seems to cause the primary to no longer work
-- name: Start Desktop Docker Containers 
-  hosts: nobody
-  tasks:
-      - name: Consul Data
-        docker:
-            name: consul-data
-            image: busybox
-            state: present
-            volumes:
-            - /data
-      - name: Consul Secondary
-        docker:
-            name: consul-secondary
-            hostname: consul-secondary
-            image: progrium/consul
-            command: -server -join 192.168.44.60 -ui-dir /ui
-            state: started
-            restart_policy: always
-            pull: always
-            ports:
-            - "8300:8300"
-            - "8301:8301"
-            - "8301:8301/udp"
-            - "8302:8302"
-            - "8302:8302/udp"
-            - "8400:8400"
-            - "8500:8500"
-            - "53:53/udp"
-            volumes_from:
-            - consul-data
-            env:
-                SERVICE_8300_NAME: consul-secondary
-                SERVICE_8301_NAME: consul-secondary-serf-lan
-                SERVICE_8302_NAME: consul-secondary-serf-wan
-                SERVICE_8400_NAME: consul-secondary-rpc
-                SERVICE_8500_NAME: consul-secondary-http
-                SERVICE_53_NAME: consul-secondary-dns
-
 - name: Oracle JDK 8 bits
-  hosts: gui 
+  hosts: oracle-jdk-8-box 
   tasks:
       - name: Create destination directory
         file: path=/usr/lib/jvm owner=root group=root state=directory mode=755
@@ -335,7 +336,7 @@
         command: /tmp/set-etc-environment.sh JAVA8_HOME /usr/lib/jvm/oracle-jdk-8
 
 - name: Oracle JDK 7 bits
-  hosts: gui 
+  hosts: oracle-jdk-7-box 
   tasks:
       - name: Create destination directory
         file: path=/usr/lib/jvm owner=root group=root state=directory mode=755
@@ -353,7 +354,7 @@
         command: /tmp/set-etc-environment.sh JAVA7_HOME /usr/lib/jvm/oracle-jdk-7
 
 - name: Groovy Environment Manager
-  hosts: gui 
+  hosts: gvm-box 
   tasks:
       - name: Copy GVM installation script to a safe place
         copy: src=scripts/install-gvm.sh dest=/tmp/install-gvm.sh owner=vagrant group=vagrant mode=755 backup=no
@@ -365,7 +366,7 @@
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
 - name: Apache Ant bits
-  hosts: gui
+  hosts: apache-ant-box
   tasks:
       - name: Create Software directory
         file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
@@ -383,7 +384,7 @@
         command: /tmp/set-etc-environment.sh ANT_HOME /home/vagrant/Software/ant
 
 - name: Apache Maven bits
-  hosts: gui 
+  hosts: apache-maven-box 
   tasks:
       - name: Create Software directory
         file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
@@ -401,7 +402,7 @@
         command: /tmp/set-etc-environment.sh M2_HOME /home/vagrant/Software/maven
 
 - name: Node
-  hosts: gui 
+  hosts: node-js-box 
   tasks:
       - name: Download Node
         get_url: url=http://nodejs.org/dist/v0.12.0/node-v0.12.0-linux-x64.tar.gz dest=/root/node.tar.gz mode=444
@@ -417,7 +418,7 @@
         command: /usr/local/bin/npm install -g npm@"2.7.1"
 
 - name: FFmpeg binary
-  hosts: gui 
+  hosts: ffmpeg-box 
   tasks:
       - name: Download FFmpeg
         get_url: url=http://johnvansickle.com/ffmpeg/releases/ffmpeg-2.6.1-64bit-static.tar.xz dest=/root/ffmpeg.tar.xz mode=444
@@ -429,7 +430,7 @@
         file: path=/opt owner=root group=root recurse=true state=directory
 
 - name: Jetbrains IntelliJ IDEA
-  hosts: gui 
+  hosts: intellij-box 
   tasks:
       - name: Create Software directory
         file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
@@ -451,7 +452,7 @@
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
 - name: Jetbrain's PyCharm IDE
-  hosts: gui 
+  hosts: pycharm-box 
   tasks:
       - name: Create Software directory
         file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
@@ -473,7 +474,7 @@
         command: /tmp/set-etc-environment.sh PYCHARM_JDK  /usr/lib/jvm/oracle-jdk-8
 
 - name: Jetbrain's RubyMine IDE
-  hosts: nobody 
+  hosts: rubymine-box 
   tasks:
       - name: Create Software directory
         file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
@@ -495,7 +496,7 @@
         command: /tmp/set-etc-environment.sh RUBYMINE_JDK /usr/lib/jvm/oracle-jdk-8
 
 - name: Jetbrain's WebStorm IDE
-  hosts: gui 
+  hosts: webstorm-box 
   tasks:
       - name: Create Software directory
         file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
@@ -517,7 +518,7 @@
         command: /tmp/set-etc-environment.sh WEBIDE_JDK /usr/lib/jvm/oracle-jdk-8
 
 - name: Spring Tool Suite
-  hosts: nobody 
+  hosts: sts-box 
   tasks:
       - name: Create Software directory
         file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
@@ -537,7 +538,7 @@
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
 - name: Groovy/Grails Tool Suite
-  hosts: nobody 
+  hosts: ggts-box 
   tasks:
       - name: Create Software directory
         file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
@@ -557,7 +558,7 @@
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
 - name: Charles proxy bits 
-  hosts: gui
+  hosts: charles-proxy-box
   tasks:
       - name: Create Software directory 
         file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
@@ -573,7 +574,7 @@
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
 - name: DbVisualizer Database Browser 
-  hosts: gui
+  hosts: dbvisualizer-box
   tasks:
       - name: Create Software directory 
         file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
@@ -589,7 +590,7 @@
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
 - name: emacs  
-  hosts: gui 
+  hosts: emacs-box 
   tasks:
       - name: Install signing keys
         apt_key: state=present keyserver=keyserver.ubuntu.com id=0D7BAE435ADBC6C3E4918A74062D648FD62FCE72
@@ -607,7 +608,7 @@
         copy: src=files/emacs.desktop dest=/home/vagrant/Desktop/emacs.desktop owner=vagrant group=vagrant backup=no mode=755
 
 - name: logFACES Client 
-  hosts: gui
+  hosts: logfaces-client-box
   tasks:
       - name: Create Software directory 
         file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
@@ -625,13 +626,13 @@
         copy: src=files/logFACES.desktop dest=/home/vagrant/Desktop/logFACES.desktop owner=vagrant group=vagrant backup=no mode=755
 
 - name: MySQL Workbench 
-  hosts: gui 
+  hosts: mysql-workbench-box 
   tasks:
       - name: Install MySQL Workbench
         apt: name=mysql-workbench state=latest
 
 - name: MySQL CLI 
-  hosts: gui 
+  hosts: mysql-cli-box 
   tasks:
       - name: Install MySQL client 
         apt: name=mysql-client state=latest
@@ -644,8 +645,6 @@
         with_items:
            - wireshark
            - chromium-browser
-      - name: Add docker to hostfile 
-        command: /tmp/add-host-name.sh docker 192.168.44.60
       - name: Copy login icon  
         copy: src=files/dr-girlfriend.png dest=/home/vagrant/.face owner=vagrant group=vagrant backup=no mode=644
       - name: Create bin directory 
