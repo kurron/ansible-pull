@@ -154,7 +154,7 @@
             - /var/lib/rabbitmq
       - name: RabbitMQ
         docker:
-            name: rabbitmq
+            name: rabbitmq:management
             hostname: rabbitmq
             image: rabbitmq
             state: started
