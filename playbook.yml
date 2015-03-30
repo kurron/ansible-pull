@@ -231,6 +231,8 @@
             state: present
             volumes:
             - /var/lib/mysql
+            - /etc/mysql/conf.d 
+# custom configuration files should be copied into /etc/mysql/conf.d
       - name: MySQL
         docker:
             name: mysql
