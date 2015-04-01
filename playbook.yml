@@ -518,11 +518,11 @@
       - name: Create Software directory
         file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
       - name: Download WebStorm
-        get_url: url=http://download.jetbrains.com/webstorm/WebStorm-9.0.3.tar.gz dest=/root/webstorm.tar.gz mode=444
+        get_url: url=http://download.jetbrains.com/webstorm/WebStorm-10.0.0.tar.gz dest=/root/webstorm.tar.gz mode=444
       - name: Unpack WebStorm
-        unarchive: src=/root/webstorm.tar.gz dest=/home/vagrant/Software copy=no owner=vagrant group=vagrant creates=/home/vagrant/Software/WebStorm-139.1112/build.txt
+        unarchive: src=/root/webstorm.tar.gz dest=/home/vagrant/Software copy=no owner=vagrant group=vagrant creates=/home/vagrant/Software/WebStorm-141.456/build.txt
       - name: Soft-link WebStorm
-        file: src=/home/vagrant/Software/WebStorm-139.1112 path=/home/vagrant/Software/webstorm state=link
+        file: src=/home/vagrant/Software/WebStorm-141.456 path=/home/vagrant/Software/webstorm state=link
       - name: Create Desktop directory
         file: path=/home/vagrant/Desktop owner=vagrant group=vagrant state=directory mode=755
       - name: Copy desktop WebStorm file
