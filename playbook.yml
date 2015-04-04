@@ -684,7 +684,6 @@
         copy: src=scripts/populate-artifactory.sh dest=/home/vagrant/bin/populate-artifactory.sh owner=vagrant group=vagrant backup=no mode=744
       - name: Install Leiningen  
         get_url: url=https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein dest=/home/vagrant/bin/lein mode=0744
-        copy: src=scripts/populate-artifactory.sh dest=/home/vagrant/bin/populate-artifactory.sh owner=vagrant group=vagrant backup=no mode=744
       - name: Set permissions on the home directory
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
