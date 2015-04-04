@@ -314,7 +314,7 @@
             restart_policy: always
             pull: always
 
-- name: Install mechached Docker Containers 
+- name: Install mecached Docker Containers 
   hosts: memcached-container
   tasks:
       - name: memcached
@@ -329,6 +329,31 @@
             - "11211:11211"
             env:
                 SERVICE_11211_NAME: memcached
+
+- name: Install Squid Proxy Docker Containers
+  hosts: squid-container
+  tasks:
+      - name: Squid Data
+        docker:
+            name: squid-data
+            image: busybox
+            state: present
+            volumes:
+            - /var/spool/squid3 
+      - name: Squid
+        docker:
+            name: squid
+            hostname: squid
+            image: sameersbn/squid 
+            state: started
+            restart_policy: always
+            pull: always
+            ports:
+            - "3128:3128"
+            volumes_from:
+            - squid-data
+            env:
+                SERVICE_3128_NAME: squid
 
 - name: Oracle JDK 8 bits
   hosts: oracle-jdk-8-box 
