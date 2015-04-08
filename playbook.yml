@@ -355,6 +355,34 @@
             env:
                 SERVICE_3128_NAME: squid
 
+- name: Install BitTorrent Sync Docker Containers
+  hosts: bittorent-sync-container
+  tasks:
+      - name: BitTorrent Sync Data
+        docker:
+            name: btsync-data
+            image: busybox
+            state: present
+            volumes:
+            - /mnt/bookkeeping
+            - /mnt/sync
+      - name: BitTorrent Sync
+        docker:
+            name: btsync
+            hostname: btsync
+            image: kurron/docker-bittorrent-sync 
+            state: started
+            restart_policy: always
+            pull: always
+            ports:
+            - "1234:1234"
+            - "8888:8888"
+            volumes_from:
+            - btsync-data
+            env:
+                SERVICE_1234_NAME: btsync
+                SERVICE_8888_NAME: btsync-ui
+
 - name: Oracle JDK 8 bits
   hosts: oracle-jdk-8-box 
   tasks:
