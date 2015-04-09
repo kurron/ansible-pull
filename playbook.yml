@@ -369,7 +369,7 @@
       - name: BitTorrent Sync
         docker:
             name: btsync
-            hostname: {{ ansible_hostname }}
+            hostname: "{{ ansible_hostname }}"
             image: kurron/docker-bittorrent-sync 
             state: started
             restart_policy: always
