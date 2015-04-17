@@ -365,9 +365,9 @@
       - name: Execute download script
         command: /tmp/download-jdk-8.sh
       - name: unpack the archive
-        unarchive: src=/root/jdk-8.tar.gz dest=/usr/lib/jvm copy=no owner=root group=root mode=755 creates=/usr/lib/jvm/jdk1.8.0_40/COPYRIGHT
+        unarchive: src=/root/jdk-8.tar.gz dest=/usr/lib/jvm copy=no owner=root group=root mode=755 creates=/usr/lib/jvm/jdk1.8.0_45/COPYRIGHT
       - name: soft-link the JDK to a normalized location
-        file: src=/usr/lib/jvm/jdk1.8.0_40 dest=/usr/lib/jvm/oracle-jdk-8 owner=root group=root state=link
+        file: src=/usr/lib/jvm/jdk1.8.0_45 dest=/usr/lib/jvm/oracle-jdk-8 owner=root group=root state=link
       - name: Copy export script to a safe place
         copy: src=scripts/set-etc-environment.sh dest=/tmp/set-etc-environment.sh owner=root group=root mode=755 backup=no
       - name: Execute JAVA_HOME
@@ -387,9 +387,9 @@
       - name: Execute download script
         command: /tmp/download-jdk-7.sh
       - name: unpack the archive
-        unarchive: src=/root/jdk-7.tar.gz dest=/usr/lib/jvm copy=no owner=root group=root mode=755 creates=/usr/lib/jvm/jdk1.7.0_75/COPYRIGHT
+        unarchive: src=/root/jdk-7.tar.gz dest=/usr/lib/jvm copy=no owner=root group=root mode=755 creates=/usr/lib/jvm/jdk1.7.0_79/COPYRIGHT
       - name: soft-link the JDK to a normalized location
-        file: src=/usr/lib/jvm/jdk1.7.0_75 dest=/usr/lib/jvm/oracle-jdk-7 owner=root group=root state=link
+        file: src=/usr/lib/jvm/jdk1.7.0_79 dest=/usr/lib/jvm/oracle-jdk-7 owner=root group=root state=link
       - name: Copy export script to a safe place
         copy: src=scripts/set-etc-environment.sh dest=/tmp/set-etc-environment.sh owner=root group=root mode=755 backup=no
       - name: Export JAVA7_HOME
