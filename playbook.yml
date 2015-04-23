@@ -701,6 +701,8 @@
         file: path=/home/vagrant/bin owner=vagrant group=vagrant state=directory mode=755
       - name: Copy Git intialization script  
         copy: src=scripts/initialize-git.sh dest=/home/vagrant/bin/initialize-git.sh owner=vagrant group=vagrant backup=no mode=744
+      - name: Copy JDK reset script  
+        copy: src=scripts/reset-jdks.sh dest=/home/vagrant/bin/reset-jdks.sh owner=vagrant group=vagrant backup=no mode=744
       - name: Copy POM file  
         copy: src=files/pom.xml dest=/home/vagrant/bin/pom.xml owner=vagrant group=vagrant backup=no mode=644
       - name: Copy settings file  
