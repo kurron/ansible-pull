@@ -38,6 +38,8 @@
            - tmux
            - subversion
            - mercurial
+           - sysstat
+           - iotop
       - name: Copy bash alias file
         copy: src=files/.bash_aliases dest=/home/vagrant/.bash_aliases owner=vagrant group=vagrant backup=no mode=744
       - name: Create GitHub directory 
