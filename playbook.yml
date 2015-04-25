@@ -271,6 +271,7 @@
             state: started
             restart_policy: always
             pull: always
+            command: --storageEngine=wiredTiger --notablescan --journalCommitInterval=300 
             ports:
             - "27017:27017"
             volumes_from:
