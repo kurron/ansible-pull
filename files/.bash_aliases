@@ -1,3 +1,4 @@
+alias docker-clean-orpahned-volumes='docker run --volume /var/run/docker.sock:/var/run/docker.sock --volume /var/lib/docker:/var/lib/docker --rm martin/docker-cleanup-volumes'
 alias docker-nuke-containers='docker rm --volumes --force $(docker ps --all --quiet)'
 alias docker-nuke-images='docker rmi $(docker images --quiet)'
 alias mongodb-cli='docker run --interactive --tty --link mongodb:mongo --rm mongo sh -c '\''exec mongo "$MONGO_PORT_27017_TCP_ADDR:$MONGO_PORT_27017_TCP_PORT/test"'\'''
