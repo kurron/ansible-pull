@@ -249,9 +249,9 @@
             volumes_from:
             - mysql-data
             env:
-                MYSQL_ROOT_PASSWORD: mysql
-                MYSQL_USER: mysql
-                MYSQL_PASSWORD: mysql
+                MYSQL_ROOT_PASSWORD: root
+                MYSQL_USER: root
+                MYSQL_PASSWORD: sa
                 MYSQL_DATABASE: example
 
 - name: Install MongoDB Docker Containers
