@@ -250,9 +250,9 @@
             - mysql-data
             env:
                 MYSQL_ROOT_PASSWORD: root
-                MYSQL_USER: root
-                MYSQL_PASSWORD: sa
-                MYSQL_DATABASE: example
+                MYSQL_USER: mysql
+                MYSQL_PASSWORD: mysql
+                MYSQL_DATABASE: sushe
 
 - name: Install MongoDB Docker Containers
   hosts: mongodb-container
