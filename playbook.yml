@@ -667,7 +667,7 @@
       - name: Create Software directory 
         file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
       - name: Download logFACES 
-        get_url: url=http://www.moonlit-software.com/logfaces/downloads/lfc.4.1.4.linux.gtk.x86_64.tar.gz dest=/root/logfaces.tar.gz mode=444 
+        get_url: url=http://www.moonlit-software.com/logfaces/downloads/lfc.4.2.0.linux.gtk.x86_64.tar.gz dest=/root/logfaces.tar.gz mode=444 
       - name: Unpack logFACES 
         unarchive: src=/root/logfaces.tar.gz dest=/home/vagrant/Software copy=no owner=vagrant group=vagrant creates=/home/vagrant/Software/logFacesClient/about.html
       - name: soft-link the JDK to a normalized location
