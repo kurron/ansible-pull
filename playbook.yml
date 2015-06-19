@@ -740,3 +740,8 @@
       - name: Unpack Terraform
         unarchive: src=/root/packer.zip dest=/usr/local/bin copy=no owner=root group=root mode=555 creates=/usr/local/bin/packer
 
+- name: AWS CLI
+  hosts: aws-box
+  tasks:
+      - name: AWS CLI
+        command: pip install --upgrade awscli
