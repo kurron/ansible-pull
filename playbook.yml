@@ -19,7 +19,7 @@
 #       service: name=docker state=restarted
         command: service docker restart 
       - name: Install Docker Compose
-        command: pip install docker-compose
+        command: pip install --upgrade docker-compose
 
 - name: Common Bits 
   hosts: all
@@ -744,4 +744,4 @@
   hosts: aws-box
   tasks:
       - name: AWS CLI
-        command: pip install awscli
+        command: pip install --upgrade awscli
