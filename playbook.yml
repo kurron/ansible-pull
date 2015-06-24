@@ -1,6 +1,8 @@
 - name: Docker Daemon 
   hosts: docker-host
   tasks:
+      - name: Upgrade Ansible to most current version 
+        command: pip install --upgrade ansible 
       - name: Install Docker keys
         apt_key: state=present keyserver=keyserver.ubuntu.com id=36A1D7869245C8950F966E92D8576A8BA88D21E9
       - name: Install Docker repository
