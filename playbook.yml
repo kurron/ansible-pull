@@ -3,6 +3,8 @@
   tasks:
       - name: Upgrade Ansible to most current version 
         command: pip install --upgrade ansible 
+      - name: Upgrade docker-py to fix Docker API issues 
+        command: pip install --upgrade docker-py 
       - name: Install Docker keys
         apt_key: state=present keyserver=keyserver.ubuntu.com id=36A1D7869245C8950F966E92D8576A8BA88D21E9
       - name: Install Docker repository
