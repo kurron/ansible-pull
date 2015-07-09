@@ -3,8 +3,8 @@
   tasks:
       - name: Upgrade Ansible to most current version 
         command: pip install --upgrade ansible 
-      - name: Upgrade docker-py to fix Docker API issues 
-        command: pip install --upgrade docker-py 
+#     - name: Upgrade docker-py to fix Docker API issues 
+#       command: pip install --upgrade docker-py 
       - name: Install Docker keys
         apt_key: state=present keyserver=keyserver.ubuntu.com id=36A1D7869245C8950F966E92D8576A8BA88D21E9
       - name: Install Docker repository
@@ -15,6 +15,8 @@
         user: name=vagrant state=present groups=docker
 #     - name: Have Docker use Consul for DNS
 #       lineinfile: dest=/etc/default/docker line='DOCKER_OPTS="--dns 192.168.44.60 --dns 8.8.8.8 --dns 8.8.4.4 --dns-search service.consul"'
+      - name: Expose the daemon over insecure HTTP
+        lineinfile: dest=/etc/default/docker line='DOCKER_OPTS="-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock"'
       - name: Set Memory and Swap Accounting
         lineinfile: dest=/etc/default/grub regexp='^GRUB_CMDLINE_LINUX=""' line='GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"'
       - name: Rebuild GRUB
