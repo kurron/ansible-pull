@@ -481,7 +481,7 @@
   hosts: ffmpeg-box 
   tasks:
       - name: Download FFmpeg
-        get_url: url=http://johnvansickle.com/ffmpeg/releases/ffmpeg-2.6.1-64bit-static.tar.xz dest=/root/ffmpeg.tar.xz mode=444
+        get_url: url=http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz dest=/root/ffmpeg.tar.xz mode=444
       - name: Unpack FFmpeg
         unarchive: src=/root/ffmpeg.tar.xz dest=/opt copy=no owner=root group=root creates=/opt/ffmpeg-2.6.1-64bit-static/ffprobe
       - name: Soft-link FFmpeg
