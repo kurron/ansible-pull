@@ -734,7 +734,7 @@
   hosts: terraform-box
   tasks:
       - name: Download Terraform
-        get_url: url=https://dl.bintray.com/mitchellh/terraform/terraform_0.6.0_linux_amd64.zip dest=/root/terraform.zip mode=444
+        get_url: url=https://dl.bintray.com/mitchellh/terraform/terraform_0.6.3_linux_amd64.zip dest=/root/terraform.zip mode=444
       - name: Unpack Terraform
         unarchive: src=/root/terraform.zip dest=/usr/local/bin copy=no owner=root group=root mode=555 creates=/usr/local/bin/terraform
 
