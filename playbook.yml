@@ -742,7 +742,7 @@
   hosts: packer-box
   tasks:
       - name: Download Packer
-        get_url: url=https://dl.bintray.com/mitchellh/packer/packer_0.8.2_linux_amd64.zip dest=/root/packer.zip mode=444
+        get_url: url=https://dl.bintray.com/mitchellh/packer/packer_0.8.6_linux_amd64.zip dest=/root/packer.zip mode=444
       - name: Unpack Terraform
         unarchive: src=/root/packer.zip dest=/usr/local/bin copy=no owner=root group=root mode=555 creates=/usr/local/bin/packer
 
