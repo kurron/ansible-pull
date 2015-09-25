@@ -1,31 +1,34 @@
 - name: Docker Daemon 
   hosts: docker-host
   tasks:
-      - name: Upgrade Ansible to most current version 
-        command: pip install --upgrade ansible 
-#     - name: Upgrade docker-py to fix Docker API issues 
-#       command: pip install --upgrade docker-py 
-      - name: Install Docker keys
-        apt_key: state=present keyserver=keyserver.ubuntu.com id=36A1D7869245C8950F966E92D8576A8BA88D21E9
-      - name: Install Docker repository
-        apt_repository: repo='deb https://get.docker.io/ubuntu docker main' state=present
-      - name: Install Docker
-        apt: name=lxc-docker state=latest update_cache=true cache_valid_time=600
-      - name: Add vagrant to the docker group
-        user: name=vagrant state=present groups=docker
-#     - name: Have Docker use Consul for DNS
-#       lineinfile: dest=/etc/default/docker line='DOCKER_OPTS="--dns 192.168.44.60 --dns 8.8.8.8 --dns 8.8.4.4 --dns-search service.consul"'
+      - name: Upgrade Ansible to most current version
+        command: pip install --upgrade ansible
+      - name: Install cURL
+        apt: name=curl state=latest update_cache=true cache_valid_time=600
+      - name: Download Docker Installation Script
+        command: /usr/bin/curl --location --output /root/install-docker https://get.docker.com/
+      - name: Set Permission Bits On The Docker Installation Script
+        file: path=/root/install-docker owner=root group=root mode=0500
+      - name: Execute Docker Installation Script
+        shell: /root/install-docker
       - name: Expose the daemon over insecure HTTP
         lineinfile: dest=/etc/default/docker line='DOCKER_OPTS="-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock"'
       - name: Set Memory and Swap Accounting
         lineinfile: dest=/etc/default/grub regexp='^GRUB_CMDLINE_LINUX=""' line='GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"'
+      - name: Add account to the docker group
+        user: name=vagrant groups=docker
+      - name: Restart Docker
+        command: service docker restart
+      - name: Test Docker
+        command: docker run hello-world
+      - name: Download Docker Compose Script
+        shell: /usr/bin/curl --location --output /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/1.4.1/docker-compose-`uname -s`-`uname -m`
+      - name: Set Permission Bits On The Docker Compose Script
+        file: path=/usr/local/bin/docker-compose owner=root group=root mode=0555
+      - name: Echo Docker Compose version
+        command: docker-compose --version
       - name: Rebuild GRUB
         command: update-grub
-      - name: Restart Docker
-#       service: name=docker state=restarted
-        command: service docker restart 
-      - name: Install Docker Compose
-        command: pip install --upgrade docker-compose
 
 - name: Common Bits 
   hosts: all
@@ -62,309 +65,6 @@
       - name: Set permissions on the home directory
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
-- name: Webmin 
-  hosts: webmin
-  tasks:
-      - name: Install Webmin keys
-        apt_key: url='http://www.webmin.com/jcameron-key.asc' state=present
-      - name: Install primary Webmin repository
-        apt_repository: repo='deb http://download.webmin.com/download/repository sarge contrib' state=present
-      - name: Install secondary Webmin repository
-        apt_repository: repo='deb http://webmin.mirror.somersettechsolutions.co.uk/repository sarge contrib' state=present
-      - name: Install Webmin software
-        apt: name=webmin state=latest
-
-- name: Install Consul Docker Container 
-  hosts: consul-container
-  tasks:
-      - name: Consul Data
-        docker:
-            name: consul-data
-            image: busybox
-            state: present
-            volumes:
-            - /data
-      - name: Consul
-        docker:
-            name: consul
-            hostname: consul
-            image: progrium/consul
-            command: -server -bootstrap -ui-dir /ui
-            state: started
-            restart_policy: always
-            pull: always
-            ports:
-            - "8300:8300"
-            - "8301:8301"
-            - "8301:8301/udp"
-            - "8302:8302"
-            - "8302:8302/udp"
-            - "8400:8400"
-            - "8500:8500"
-            - "53:53/udp"
-            volumes_from:
-            - consul-data
-            env:
-                SERVICE_8300_NAME: consul
-                SERVICE_8301_NAME: consul-serf-lan
-                SERVICE_8302_NAME: consul-serf-wan
-                SERVICE_8400_NAME: consul-rpc
-                SERVICE_8500_NAME: consul-http
-                SERVICE_53_NAME: consul-dns
-
-- name: Install Consul Registrator 
-  hosts: registrator
-  tasks:
-      - name: Regitrator 
-        docker:
-            name: registrator
-            hostname: registrator
-            image: gliderlabs/registrator
-            command: -ip 192.168.44.60 consul://192.168.44.60:8500
-            state: started
-            restart_policy: always
-            pull: always
-            volumes:
-            - /var/run/docker.sock:/tmp/docker.sock
-
-- name: Install Redis Containers
-  hosts: redis-container
-  tasks:
-      - name: Redis Data
-        docker:
-            name: redis-data
-            image: busybox
-            state: present
-            volumes:
-            - /data
-      - name: Redis
-        docker:
-            name: redis
-            hostname: redis
-            image: redis
-            command: redis-server --appendonly yes
-            state: started
-            restart_policy: always
-            pull: always
-            ports:
-            - "6379:6379"
-            volumes_from:
-            - redis-data
-
-- name: Install RabbitMQ Docker Containers
-  hosts: rabbitmq-container
-  tasks:
-      - name: RabbitMQ Data
-        docker:
-            name: rabbitmq-data
-            image: busybox
-            state: present
-            volumes:
-            - /var/lib/rabbitmq
-      - name: RabbitMQ
-        docker:
-            name: rabbitmq
-            hostname: rabbitmq
-            image: rabbitmq:management
-            state: started
-            restart_policy: always
-            pull: always
-            ports:
-            - "5672:5672"
-            - "15672:15672"
-            volumes_from:
-            - rabbitmq-data
-            env:
-                SERVICE_5672_NAME: rabbitmq
-                SERVICE_15672_NAME: rabbitmq-console
-
-- name: Install PostgreSQL Docker Containers
-  hosts: postgresql-container
-  tasks:
-      - name: PostgreSQL Data
-        docker:
-            name: posgresql-data
-            image: busybox
-            state: present
-            volumes:
-            - /var/lib/postgresql/data
-      - name: PostgreSQL
-        docker:
-            name: postgresql
-            hostname: postgresql
-            image: postgres
-            state: started
-            restart_policy: always
-            pull: always
-            ports:
-            - "5432:5432"
-            volumes_from:
-            - posgresql-data
-            env:
-                POSTGRES_PASSWORD: posgres
-
-- name: Install Nginx Docker Containers
-  hosts: nginx-container
-  tasks:
-      - name: Nginx Data
-        docker:
-            name: nginx-data
-            image: busybox
-            state: present
-            volumes:
-            - /var/cache/nginx
-      - name: Nginx
-        docker:
-            name: nginx
-            hostname: nginx
-            image: nginx
-            state: started
-            restart_policy: always
-            pull: always
-            ports:
-            - "80:80"
-            - "443:443"
-            volumes_from:
-            - nginx-data
-            env:
-                SERVICE_80_NAME: nginx
-                SERVICE_443_NAME: nginx-secure
-
-- name: Install MySQL Docker Containers
-  hosts: mysql-container
-  tasks:
-      - name: MySQL Data
-        docker:
-            name: mysql-data
-            image: busybox
-            state: present
-            volumes:
-            - /var/lib/mysql
-            - /etc/mysql/conf.d 
-# custom configuration files should be copied into /etc/mysql/conf.d
-      - name: MySQL
-        docker:
-            name: mysql
-            hostname: mysql
-            image: mysql
-            state: started
-            restart_policy: always
-            pull: always
-            ports:
-            - "3306:3306"
-            volumes_from:
-            - mysql-data
-            env:
-                MYSQL_ROOT_PASSWORD: root
-                MYSQL_USER: mysql
-                MYSQL_PASSWORD: mysql
-                MYSQL_DATABASE: sushe
-
-- name: Install MongoDB Docker Containers
-  hosts: mongodb-container
-  tasks:
-      - name: MongoDB Data
-        docker:
-            name: mongodb-data
-            image: busybox
-            state: present
-            volumes:
-            - /data/db
-      - name: MongoDB
-        docker:
-            name: mongodb
-            hostname: mongodb
-            image: mongo
-            state: started
-            restart_policy: always
-            pull: always
-            command: --storageEngine=wiredTiger --notablescan --journalCommitInterval=300 
-            ports:
-            - "27017:27017"
-            volumes_from:
-            - mongodb-data
-
-- name: Install Elasticsearch Docker Containers
-  hosts: elasticsearch-container
-  tasks:
-      - name: Elasticsearch Data
-        docker:
-            name: elasticsearch-data
-            image: busybox
-            state: present
-            volumes:
-            - /usr/share/elasticsearch/data
-      - name: Elasticsearch
-        docker:
-            name: elasticsearch
-            hostname: elasticsearch
-            image: elasticsearch
-            state: started
-            restart_policy: always
-            pull: always
-            ports:
-            - "9200:9200"
-            - "9300:9300"
-            volumes_from:
-            - elasticsearch-data
-            env:
-                SERVICE_9200_NAME: elasticsearch
-                SERVICE_9300_NAME: elasticsearch-cluster
-
-# still trying t figure out how to use this image
-- name: Install Logstash Docker Containers
-  hosts: logstash-container
-  tasks:
-      - name: logstash
-        docker:
-            name: logstash
-            hostname: logstash
-            image: logstash
-            state: started
-            restart_policy: always
-            pull: always
-
-- name: Install mecached Docker Containers 
-  hosts: memcached-container
-  tasks:
-      - name: memcached
-        docker:
-            name: memcached
-            hostname: memcached
-            image: memcached
-            state: started
-            restart_policy: always
-            pull: always
-            ports:
-            - "11211:11211"
-            env:
-                SERVICE_11211_NAME: memcached
-
-- name: Install Squid Proxy Docker Containers
-  hosts: squid-container
-  tasks:
-      - name: Squid Data
-        docker:
-            name: squid-data
-            image: busybox
-            state: present
-            volumes:
-            - /var/spool/squid3 
-      - name: Squid
-        docker:
-            name: squid
-            hostname: squid
-            image: sameersbn/squid 
-            state: started
-            restart_policy: always
-            pull: always
-            ports:
-            - "3128:3128"
-            volumes_from:
-            - squid-data
-            env:
-                SERVICE_3128_NAME: squid
-
 - name: Oracle JDK 8 bits
   hosts: oracle-jdk-8-box 
   tasks:
@@ -375,9 +75,9 @@
       - name: Execute download script
         command: /tmp/download-jdk-8.sh
       - name: unpack the archive
-        unarchive: src=/root/jdk-8.tar.gz dest=/usr/lib/jvm copy=no owner=root group=root mode=755 creates=/usr/lib/jvm/jdk1.8.0_51/COPYRIGHT
+        unarchive: src=/root/jdk-8.tar.gz dest=/usr/lib/jvm copy=no owner=root group=root mode=755 creates=/usr/lib/jvm/jdk1.8.0_60/COPYRIGHT
       - name: soft-link the JDK to a normalized location
-        file: src=/usr/lib/jvm/jdk1.8.0_51 dest=/usr/lib/jvm/oracle-jdk-8 owner=root group=root state=link
+        file: src=/usr/lib/jvm/jdk1.8.0_60 dest=/usr/lib/jvm/oracle-jdk-8 owner=root group=root state=link
       - name: Copy export script to a safe place
         copy: src=scripts/set-etc-environment.sh dest=/tmp/set-etc-environment.sh owner=root group=root mode=755 backup=no
       - name: Execute JAVA_HOME
@@ -495,11 +195,11 @@
       - name: Create Software directory
         file: path=/home/vagrant/Software owner=vagrant group=vagrant state=directory mode=755
       - name: Download IntelliJ IDEA
-        get_url: url=http://download.jetbrains.com/idea/ideaIU-14.1.4.tar.gz dest=/root/idea.tar.gz mode=444
+        get_url: url=http://download.jetbrains.com/idea/ideaIU-14.1.5.tar.gz dest=/root/idea.tar.gz mode=444
       - name: Unpack IntelliJ IDEA
-        unarchive: src=/root/idea.tar.gz dest=/home/vagrant/Software copy=no owner=vagrant group=vagrant creates=/home/vagrant/Software/idea-IU-141.1532.4/build.txt
+        unarchive: src=/root/idea.tar.gz dest=/home/vagrant/Software copy=no owner=vagrant group=vagrant creates=/home/vagrant/Software/idea-IU-141.2735.5/build.txt
       - name: Soft-link IntelliJ
-        file: src=/home/vagrant/Software/idea-IU-141.1532.4 path=/home/vagrant/Software/idea state=link
+        file: src=/home/vagrant/Software/idea-IU-141.2735.5 path=/home/vagrant/Software/idea state=link
       - name: Create Desktop directory
         file: path=/home/vagrant/Desktop owner=vagrant group=vagrant state=directory mode=755
       - name: Copy desktop IntelliJ file
